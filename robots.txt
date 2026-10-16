@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /go
+Sitemap: https://hassma0k.github.io/sawagi-site/sitemap.xml

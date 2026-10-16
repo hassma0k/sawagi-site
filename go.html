@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سواقي — جارٍ التحويل إلى App Store</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0B62FE">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0B62FE;color:#fff;font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;text-align:center;padding:24px}
+  img{width:84px;height:84px;border-radius:22px;margin:0 auto 18px;display:block}
+  h1{font-size:26px;margin:0 0 8px} p{margin:0 0 20px;color:#DCE8FF;font-size:17px;line-height:1.7}
+  a.btn{display:inline-block;background:#fff;color:#0B62FE;font-weight:700;border-radius:16px;padding:14px 28px;text-decoration:none;font-size:17px}
+</style>
+</head>
+<body>
+<div>
+  <img src="assets/logo.png" alt="سواقي" width="84" height="84">
+  <h1 id="title">جارٍ فتح App Store…</h1>
+  <p id="msg">إن لم يُفتح تلقائيًا اضغط الزر أدناه.</p>
+  <a class="btn" id="fallback" href="https://apps.apple.com/sa/app/id6806620276">فتح في App Store</a>
+  <noscript><p style="margin-top:16px">فعّل JavaScript أو اضغط الزر أعلاه.</p></noscript>
+</div>
+
+<script>
+/* ============================================================
+   EDIT THIS BLOCK (see DEPLOY.md part F/G)
+   Usage:  https://hassma0k.github.io/sawagi-site/go?c=tiktok            -> campaign link, source "tiktok"
+           https://hassma0k.github.io/sawagi-site/go?c=wa&p=school       -> + Custom Product Page "school"
+           https://hassma0k.github.io/sawagi-site/go?c=office&o=riyadh1  -> partner office "riyadh1" (ct=office-riyadh1)
+   ============================================================ */
+var CONFIG = {
+  APP_ID: '6806620276',
+  STORE: 'sa',                       // Saudi storefront
+  PROVIDER_TOKEN: 'PROVIDER_TOKEN',  // <- the "pt" number from App Store Connect (DEPLOY.md part F). Replace the word PROVIDER_TOKEN.
+  // Custom Product Page ids (the long code after "ppid=" in each CPP link from App Store Connect).
+  // Leave the placeholder as it is until you create the page; it is then simply ignored.
+  CPP: {
+    school: 'CPP_SCHOOL_ID',
+    owner:  'CPP_OWNER_CONTROL_ID',
+    driver: 'CPP_DRIVER_INVITE_ID'
+  },
+  // Allowed channel names (anything else becomes "other"). Keep them short, lowercase, no spaces.
+  CHANNELS: ['web','tiktok','snap','wa','pdf','office','bio','ig','ads','other'],
+  // Google Play link: fill when Android is live (e.g. https://play.google.com/store/apps/details?id=com.hassma0k.mydriver). Empty = not yet.
+  PLAY_URL: ''
+};
+
+(function () {
+  var q = new URLSearchParams(location.search);
+  var c = (q.get('c') || 'other').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 20);
+  if (CONFIG.CHANNELS.indexOf(c) < 0) c = 'other';
+  var o = (q.get('o') || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 20);
+  var ct = (c === 'office' && o) ? ('office-' + o) : c;          // ct must be <= 40 chars
+  var p = (q.get('p') || '').toLowerCase();
+  var base = 'https://apps.apple.com/' + CONFIG.STORE + '/app/id' + CONFIG.APP_ID;
+
+  var url = base + '?ct=' + encodeURIComponent(ct) + '&mt=8';
+  if (CONFIG.PROVIDER_TOKEN && CONFIG.PROVIDER_TOKEN !== 'PROVIDER_TOKEN') url += '&pt=' + encodeURIComponent(CONFIG.PROVIDER_TOKEN);
+  var ppid = CONFIG.CPP[p];
+  if (ppid && !/^CPP_/.test(ppid)) url += '&ppid=' + encodeURIComponent(ppid);
+
+  var a = document.getElementById('fallback');
+  a.href = url;
+
+  var isAndroid = /android/i.test(navigator.userAgent);
+  if (isAndroid) {
+    if (CONFIG.PLAY_URL) {
+      var play = CONFIG.PLAY_URL + (CONFIG.PLAY_URL.indexOf('?') > -1 ? '&' : '?') + 'referrer=' + encodeURIComponent('utm_source=' + c + '&utm_medium=go');
+      a.href = play; a.textContent = 'فتح في Google Play';
+      location.replace(play);
+    } else {
+      document.getElementById('title').textContent = 'نسخة أندرويد قريبًا';
+      document.getElementById('msg').textContent = 'سواقي متاح الآن على iPhone، ونسخة أندرويد في الطريق. يمكنك الاطلاع على صفحتنا.';
+      a.href = 'index.html'; a.textContent = 'الصفحة الرئيسية';
+    }
+    return;
+  }
+  // iPhone, iPad, Mac and desktop: go straight to the App Store page (desktop shows the web page with a QR code)
+  location.replace(url);
+})();
+</script>
+</body>
+</html>
